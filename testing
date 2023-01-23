@@ -1,2 +1,64 @@
-In the jungle the mighty jungle 
-testing testing testing 
+/**
+ * @file PWM-motor-control.ino
+ * @author Joshua Marshall (joshua.marshall@queensu.ca)
+ * @brief Arduino program to drive one wheel motor through a motor driver.
+ * @version 2.0
+ * @date 2022-12-05
+ *
+ * @copyright Copyright (c) 2021-2022
+ *
+ */
+
+ 
+
+int EA = 5; // Wheel PWM pin (must be a PWM pin)
+int EB = 6;
+int I1 = 8; // Wheel direction digital pin 1
+int I2 = 10; // Wheel direction digital pin 2
+int I3 = 7; 
+int I4 = 2; 
+
+ 
+
+
+void setup()
+{
+    // Configure digital pins for output
+    pinMode(I1,OUTPUT); 
+    pinMode(I2,OUTPUT);
+    pinMode(I3,OUTPUT); 
+    pinMode(I4,OUTPUT);
+    pinMode(EA, OUTPUT);
+    pinMode(EB, OUTPUT); 
+
+ 
+
+}
+
+ 
+
+void loop()
+{
+    int u; // A variable for the motor PWM command [0-255]
+
+ 
+
+    // Play with this code to write open loop commands to a wheel motor
+    for (u = 0; u <= 255; u += 5)
+    {
+        // Select a direction 
+        digitalWrite(I1, HIGH);  
+        digitalWrite(I2, HIGH); 
+        digitalWrite(I3, HIGH); 
+        digitalWrite(I4, HIGH); 
+        
+        // PWM command to the motor driver
+        analogWrite(EA, u);
+        analogWrite(EB, u); 
+
+ 
+
+        // Brief delay (perhaps not necessary)
+        delay(10);
+    }
+}
