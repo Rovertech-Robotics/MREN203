@@ -9,7 +9,8 @@
  *
  */
 
-// Encoder digital pins
+// Encoder digital pins //adding in some comments to see what github does 
+
 
 //for the right side the A channel is 12 and the B channel is 13 
 //For the left motor it's 3 and 4. 
