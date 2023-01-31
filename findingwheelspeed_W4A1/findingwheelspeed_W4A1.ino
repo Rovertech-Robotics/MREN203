@@ -126,7 +126,38 @@ void setup()
 }
 
 void loop() {
+// Get the elapsed time [ms]
+    t_now = millis();
+    //if the timestep is greater than or equal to a second, 
+    if (t_now - t_last >= T)
+    {     
+        // Estimate the rotational speed [rad/s]
+        omega_L = 2.0 * PI * ((double)encoder_ticks2 / (double)TPR) * 1000.0 / (double)(t_now - t_last);
+        omega_R =  2.0 * PI * ((double)encoder_ticks / (double)TPR) * 1000.0 / (double)(t_now - t_last);
+        v_L = omega_L*RHO; 
+        v_R = omega_R*RHO; 
+
+        // Record the current time [ms]
+        t_last = t_now;
+
+        // Reset the encoder ticks counter
+        encoder_ticks = 0;
+        encoder_ticks2 = 0; 
+    }
+    
+
+    // Set the wheel motor PWM command [0-255]
+    u = 128;
+
+    // Write to the output pins
+    digitalWrite(M1, LOW); // Drive forward (left wheels)
+    analogWrite(E1, u);    // Write left motors command
+    digitalWrite(M2, LOW); // Drive forward (right wheels)
+    analogWrite(E2, u);    // Write rightmotors command
+  
   //measure the current v_L and v_R
+  
+  //ensure that the input, u, stays between 0-255
   short PI_controller(double e_now, double e_int, double k_P, double k_I)
   {
     short = u; 
@@ -142,40 +173,7 @@ void loop() {
     return u; 
   }
   u_L = k_P(v_l)
-// Get the elapsed time [ms]
-    t_now = millis();
-    
-
-    if (t_now - t_last >= T)
-    {
-    
-          
-        // Estimate the rotational speed [rad/s]
-        omega_L = 2.0 * PI * ((double)encoder_ticks2 / (double)TPR) * 1000.0 / (double)(t_now - t_last);
-        omega_R =  2.0 * PI * ((double)encoder_ticks / (double)TPR) * 1000.0 / (double)(t_now - t_last);
-        v_L = omega_L*RHO; 
-        v_R = omega_R*RHO; 
-       
-        
-        
-
-        // Record the current time [ms]
-        t_last = t_now;
-
-        // Reset the encoder ticks counter
-        encoder_ticks = 0;
-        encoder_ticks2 = 0; 
-    }
-
-    // Set the wheel motor PWM command [0-255]
-    u = 128;
-
-    // Write to the output pins
-    digitalWrite(M1, LOW); // Drive forward (left wheels)
-    analogWrite(E1, u);    // Write left motors command
-    digitalWrite(M2, LOW); // Drive forward (right wheels)
-    analogWrite(E2, u);    // Write rightmotors command
 
 }
 
-}
+
