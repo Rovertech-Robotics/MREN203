@@ -1,5 +1,7 @@
 void setup() {
-  // put your setup code here, to run once:
+  //pin assigments 
+  int a = 6; 
+  
 
 }
 
