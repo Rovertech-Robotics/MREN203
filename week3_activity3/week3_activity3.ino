@@ -166,7 +166,7 @@ void loop()
         Serial.print(" rad/s");
         Serial.print("\n");
         Serial.print("Estimated Left wheel translational speed: ");
-        Serial.print(v_L);
+        Serial.print(-1*v_L);
         Serial.print(" rad/s");
         Serial.print("\n");
 
