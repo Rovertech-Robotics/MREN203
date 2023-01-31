@@ -16,6 +16,10 @@
 // Variables to store angular rates from the gyro [degrees/s]
 float omega_x, omega_y, omega_z;
 
+float w_x = omega_x - 1;
+float w_y = omega_y + 12;
+float w_z= omega_z - 1.5;
+
 // Variables to store accelerations [g's]
 float a_x, a_y, a_z;
 
@@ -85,11 +89,11 @@ void loop()
         IMU.readGyroscope(omega_x, omega_y, omega_z);
 
         // Print the gyroscope measurements to the Serial Monitor
-        Serial.print(omega_x);
+        Serial.print(w_x);
         Serial.print("\t");
-        Serial.print(omega_y);
+        Serial.print(w_y);
         Serial.print("\t");
-        Serial.print(omega_z);
+        Serial.print(w_z);
         Serial.print(" deg/s\n");
     }
 }
