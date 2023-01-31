@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2022
  *
  */
-
+//testing
 // Encoder digital pins
 
 //for the right side the A channel is 12 and the B channel is 13 
@@ -192,10 +192,3 @@ void loop()
     analogWrite(E2, u);    // Write rightmotors command
 
 }
-
-
-
-
-
-
-
