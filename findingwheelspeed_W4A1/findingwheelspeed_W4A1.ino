@@ -1,4 +1,3 @@
-
 /**
  * @file findingwheelspeed_W4A2.ino
  * @author Daniel Tcherkezian (20dt18@queensu.ca)
@@ -53,7 +52,9 @@ double omega_L = 0.0;
 double omega_R = 0.0; 
 // Sampling interval for measurements in milliseconds
 const int T = 1000;
-
+//ELL is the track of the robot
+const double ELL = 0.2775
+//speed of the left and right wheels 
 double v_L = 0;
 double v_R =0; 
 
@@ -143,6 +144,7 @@ void loop() {
         // Reset the encoder ticks counter
         encoder_ticks = 0;
         encoder_ticks2 = 0; 
+
     }
     
 
@@ -155,12 +157,25 @@ void loop() {
     digitalWrite(M2, LOW); // Drive forward (right wheels)
     analogWrite(E2, u);    // Write rightmotors command
   
-  //measure the current v_L and v_R
-  
+  // Compute vehicle speed [m/s]
+  double compute ̇vehicle ̇speed(double v_L, double v_R)
+  {
+    double v;
+    v = 0.5 * (v_L + v_R);
+    return v;
+  }
+  // Compute vehicle turning rate [rad/s]
+  double compute ̇vehicle ̇rate(double v_L, double v_R)
+  {
+    double omega;
+    omega = 1.0 / ELL * (v_R - v_L);
+    return omega;
+  }
+
   //ensure that the input, u, stays between 0-255
   short PI_controller(double e_now, double e_int, double k_P, double k_I)
   {
-    short = u; 
+    short = u_L; 
     u = short(k_P*e_now+k_I*e_int); 
     if (u>255)
     {
@@ -172,7 +187,8 @@ void loop() {
     }
     return u; 
   }
-  u_L = k_P(v_l)
+  
+  
 
 }
 
