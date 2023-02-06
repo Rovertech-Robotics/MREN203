@@ -33,6 +33,8 @@ const byte E2 = 5;
 // Motor driver direction pin
 const byte M1 = 10;
 const byte M2 = 8; 
+const byte M3 = 7;
+const byte M4 = 2; 
 
 // Motor PWM command variable [0-255]
 byte u = 0;
@@ -97,13 +99,13 @@ void decodeEncoderTicks2()
         encoder_ticks2++;
     }
 }
-// Compute vehicle speed [m/s]
+  // Compute vehicle speed [m/s]
 double compute_vehicle_speed(double v_L, double v_R) 
 {
     double v; 
     v = 0.5*(v_L+v_R);
     return v;
-  }
+}
   // Compute vehicle turning rate [rad/s]
 double compute_vehicle_rate(double v_L, double v_R)
 {
@@ -111,7 +113,9 @@ double compute_vehicle_rate(double v_L, double v_R)
     omega = 1.0 / ELL*(v_R-v_L); 
     return omega;
 }
-//ensure that the input, u, stays between 0-255
+
+
+//Compute errors and ensure that the input, u, stays between 0-255
 short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
 {
     short u_L; 
@@ -123,23 +127,26 @@ short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
     else if (u_L<-255)
     {
       u_L = -255;
+
     }
     return u_L; 
 }
 short PI_controller_right(double e_now, double e_int, double k_P, double k_I)
 {
-    short u_L; 
-    u_L = (short)(k_P*e_now+k_I*e_int); 
-    if (u_L>255)
+    short u_R; 
+    u_R = (short)(k_P*e_now+k_I*e_int); 
+    if (u_R>255)
     {
-      u_L = 255;
+      u_R = 255;
     }
-    else if (u_L<-255)
+    else if (u_R<-255)
     {
-      u_L = -255;
+      u_R = -255;
+      
     }
-    return u_L; 
+    return u_R; 
 }
+
 void setup()
 {
     // Open the serial port at 9600 bps
@@ -148,6 +155,7 @@ void setup()
 
     // Set the pin modes for the motor driver
     pinMode(M1, OUTPUT);
+    pinMode(M2, OUTPUT); 
 
     // Set the pin modes for the encoders
     pinMode(SIGNAL_A, INPUT);
@@ -165,13 +173,14 @@ void setup()
     // Every time SIGNAL_A goes HIGH, this is a pulse
     attachInterrupt(digitalPinToInterrupt(SIGNAL_A), decodeEncoderTicks, RISING);
     attachInterrupt(digitalPinToInterrupt(SIGNAL_C), decodeEncoderTicks2, RISING);
+    
 
 
 }
 
 void loop() {
 // Get the elapsed time [ms]
-    t_now = millis();
+   /* t_now = millis();
     //if the timestep is greater than or equal to a second, 
     if (t_now - t_last >= T)
     {     
@@ -189,19 +198,21 @@ void loop() {
         encoder_ticks2 = 0; 
 
     }
-    
+
 
     // Set the wheel motor PWM command [0-255]
-    u = 128;
+    u = 255;*/
+    //Safety delay
+    delay(2000);
 
     // Write to the output pins
-    digitalWrite(M1, LOW); // Drive forward (left wheels)
-    analogWrite(E1, u);    // Write left motors command
-    digitalWrite(M2, LOW); // Drive forward (right wheels)
-    analogWrite(E2, u);    // Write rightmotors command
-   
+    digitalWrite(M1, HIGH); // Drive forward (left wheels)
+    digitalWrite(M2, LOW);
+    analogWrite(E1, 1000);    // Write left motors command
+    digitalWrite(M3, HIGH); // Drive forward (right wheels)
+    digitalWrite(M4, LOW);
+    analogWrite(E2, 1000);    // Write rightmotors command
   
-
 }
 
 
