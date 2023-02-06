@@ -180,7 +180,7 @@ void setup()
 
 void loop() {
 // Get the elapsed time [ms]
-   /* t_now = millis();
+    t_now = millis();
     //if the timestep is greater than or equal to a second, 
     if (t_now - t_last >= T)
     {     
@@ -201,18 +201,26 @@ void loop() {
 
 
     // Set the wheel motor PWM command [0-255]
-    u = 255;*/
+    u = 200;
     //Safety delay
     delay(2000);
 
     // Write to the output pins
-    digitalWrite(M1, HIGH); // Drive forward (left wheels)
-    digitalWrite(M2, LOW);
-    analogWrite(E1, 1000);    // Write left motors command
-    digitalWrite(M3, HIGH); // Drive forward (right wheels)
-    digitalWrite(M4, LOW);
-    analogWrite(E2, 1000);    // Write rightmotors command
-  
+    digitalWrite(M1, LOW); // Drive forward (left wheels)
+    digitalWrite(M2, HIGH);
+    analogWrite(E1, u);    // Write left motors command
+    digitalWrite(M3, LOW); // Drive forward (right wheels)
+    digitalWrite(M4, HIGH);
+    analogWrite(E2, u);    // Write rightmotors command
+
+//calculate speed and turn rate
+compute_vehicle_speed(v_L, v_R);
+compute_vehicle_rate(v_L, v_R);
+//calculate speed error
+
+//implement PI control  
+PI_controller_left(); 
+PI_controller_right(); 
 }
 
 
