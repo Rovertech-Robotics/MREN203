@@ -53,7 +53,7 @@ double omega_R = 0.0;
 // Sampling interval for measurements in milliseconds
 const int T = 1000;
 //ELL is the track of the robot
-const double ELL = 0.2775
+const double ELL = 0.2775;
 //speed of the left and right wheels 
 double v_L = 0;
 double v_R =0; 
@@ -96,6 +96,49 @@ void decodeEncoderTicks2()
         // SIGNAL_C leads SIGNAL_D, so count the other way
         encoder_ticks2++;
     }
+}
+// Compute vehicle speed [m/s]
+double compute_vehicle_speed(double v_L, double v_R) 
+{
+    double v; 
+    v = 0.5*(v_L+v_R);
+    return v;
+  }
+  // Compute vehicle turning rate [rad/s]
+double compute_vehicle_rate(double v_L, double v_R)
+{
+    double omega;
+    omega = 1.0 / ELL*(v_R-v_L); 
+    return omega;
+}
+//ensure that the input, u, stays between 0-255
+short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
+{
+    short u_L; 
+    u_L = (short)(k_P*e_now+k_I*e_int); 
+    if (u_L>255)
+    {
+      u_L = 255;
+    }
+    else if (u_L<-255)
+    {
+      u_L = -255;
+    }
+    return u_L; 
+}
+short PI_controller_right(double e_now, double e_int, double k_P, double k_I)
+{
+    short u_L; 
+    u_L = (short)(k_P*e_now+k_I*e_int); 
+    if (u_L>255)
+    {
+      u_L = 255;
+    }
+    else if (u_L<-255)
+    {
+      u_L = -255;
+    }
+    return u_L; 
 }
 void setup()
 {
@@ -156,38 +199,7 @@ void loop() {
     analogWrite(E1, u);    // Write left motors command
     digitalWrite(M2, LOW); // Drive forward (right wheels)
     analogWrite(E2, u);    // Write rightmotors command
-  
-  // Compute vehicle speed [m/s]
-  double compute ̇vehicle ̇speed(double v_L, double v_R)
-  {
-    double v;
-    v = 0.5 * (v_L + v_R);
-    return v;
-  }
-  // Compute vehicle turning rate [rad/s]
-  double compute ̇vehicle ̇rate(double v_L, double v_R)
-  {
-    double omega;
-    omega = 1.0 / ELL * (v_R - v_L);
-    return omega;
-  }
-
-  //ensure that the input, u, stays between 0-255
-  short PI_controller(double e_now, double e_int, double k_P, double k_I)
-  {
-    short = u_L; 
-    u = short(k_P*e_now+k_I*e_int); 
-    if (u>255)
-    {
-      u = 255;
-    }
-    else if (u<-255)
-    {
-      u = -255;
-    }
-    return u; 
-  }
-  
+   
   
 
 }
