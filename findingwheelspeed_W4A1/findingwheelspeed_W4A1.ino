@@ -37,8 +37,8 @@ const byte M3 = 7;
 const byte M4 = 2; 
 
 // Motor PWM command variable [0-255]
-byte u = 0;
-
+byte u_L = 0;
+byte u_R = 0;
 // Encoder ticks per (motor) revolution (TPR)
 const int TPR = 3000;
 
@@ -101,20 +101,30 @@ void decodeEncoderTicks2()
         encoder_ticks2++;
     }
 }
-  // Compute vehicle speed [m/s]
+// Compute vehicle speed [m/s]
 double compute_vehicle_speed(double v_L, double v_R) 
 {
     double v; 
     v = 0.5*(v_L+v_R);
     return v;
 }
-  // Compute vehicle turning rate [rad/s]
+// Compute vehicle turning rate [rad/s]
 double compute_vehicle_rate(double v_L, double v_R)
 {
     double omega;
     omega = 1.0 / ELL*(v_R-v_L); 
     return omega;
 }
+//Caclulate errors 
+double compute_errorLeft()
+{
+  
+}
+double compute_errorRight()
+{
+
+}
+
 
 
 //Compute errors and ensure that the input, u, stays between 0-255
@@ -203,29 +213,31 @@ void loop() {
 
 
     // Set the wheel motor PWM command [0-255]
-    u = 200;
+    u_R = 200;
+    u_L = 200;
     //Safety delay
     delay(2000);
 
     // Write to the output pins
     digitalWrite(M1, LOW); // Drive forward (left wheels)
     digitalWrite(M2, HIGH);
-    analogWrite(E1, u);    // Write left motors command
+    analogWrite(E1, u_L);    // Write left motors command
     digitalWrite(M3, LOW); // Drive forward (right wheels)
     digitalWrite(M4, HIGH);
-    analogWrite(E2, u);    // Write rightmotors command
+    analogWrite(E2, u_R);    // Write rightmotors command
 
 //calculate speed and turn rate
 compute_vehicle_speed(v_L, v_R);
 compute_vehicle_rate(v_L, v_R);
 //calculate speed error
-e_now
+
+
 
 //calculate error integral 
 
 //implement PI control  
-PI_controller_left(); 
-PI_controller_right(); 
+//PI_controller_left(); 
+//PI_controller_right(); 
 }
 
 
