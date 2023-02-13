@@ -116,13 +116,13 @@ double compute_vehicle_rate(double v_L, double v_R)
     return omega;
 }
 //Caclulate errors 
-double compute_errorLeft()
+double compute_errorL(u_L, v_L)
 {
-
+  e_nowL = u_L - v_L; 
 }
-double compute_errorRight()
+double compute_errorR(u_R, v_R)
 {
-
+  e_nowR = u_R - v_R; 
 }
 //Compute error integrals
 double lefterror_integral()
@@ -131,14 +131,14 @@ double lefterror_integral()
 }
 double righterror_integral()
 {
-  
+
 }
 
 //Compute errors and ensure that the input, u, stays between 0-255
-short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
+short PI_controller_left(double e_nowL, double e_int, double k_P, double k_I)
 {
     short u_L; 
-    u_L = (short)(k_P*e_now+k_I*e_int); 
+    u_L = (short)(k_P*e_nowL+k_I*e_intL); 
     if (u_L>255)
     {
       u_L = 255;
@@ -150,10 +150,10 @@ short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
     }
     return u_L; 
 }
-short PI_controller_right(double e_now, double e_int, double k_P, double k_I)
+short PI_controller_right(double e_nowR, double e_int, double k_P, double k_I)
 {
     short u_R; 
-    u_R = (short)(k_P*e_now+k_I*e_int); 
+    u_R = (short)(k_P*e_nowR+k_I*e_intR); 
     if (u_R>255)
     {
       u_R = 255;
@@ -236,15 +236,16 @@ void loop() {
 //calculate speed and turn rate
 compute_vehicle_speed(v_L, v_R);
 compute_vehicle_rate(v_L, v_R);
+
 //calculate speed error
-
-
+compute_errorLeft(u_L, v_L);
+compute_errorRight(u_R, v_R); 
 
 //calculate error integral 
 
 //implement PI control  
-//PI_controller_left(); 
-//PI_controller_right(); 
+PI_controller_left(e_nowL, e_intL, k_P, k_L); 
+PI_controller_right(e_nowR, e_intR, k_P,k_L); 
 }
 
 
