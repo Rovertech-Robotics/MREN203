@@ -118,14 +118,21 @@ double compute_vehicle_rate(double v_L, double v_R)
 //Caclulate errors 
 double compute_errorLeft()
 {
-  
+
 }
 double compute_errorRight()
 {
 
 }
+//Compute error integrals
+double lefterror_integral()
+{
 
-
+}
+double righterror_integral()
+{
+  
+}
 
 //Compute errors and ensure that the input, u, stays between 0-255
 short PI_controller_left(double e_now, double e_int, double k_P, double k_I)
