@@ -59,7 +59,9 @@ const double ELL = 0.2775;
 //speed of the left and right wheels 
 double v_L = 0;
 double v_R =0; 
-
+//Set gains for the feedback controller, k_P, k_I
+const double k_P = 200; 
+const double k_I = 100; 
 // Counters for milliseconds during interval
 long t_now = 0;
 long t_last = 0;
@@ -217,6 +219,9 @@ void loop() {
 compute_vehicle_speed(v_L, v_R);
 compute_vehicle_rate(v_L, v_R);
 //calculate speed error
+e_now
+
+//calculate error integral 
 
 //implement PI control  
 PI_controller_left(); 
