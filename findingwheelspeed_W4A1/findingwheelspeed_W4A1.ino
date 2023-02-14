@@ -115,19 +115,11 @@ double compute_vehicle_rate(double v_L, double v_R)
     omega = 1.0 / ELL*(v_R-v_L); 
     return omega;
 }
-//Caclulate errors 
-double compute_errorL(u_L, v_L)
-{
-  e_nowL = u_L - v_L; 
-}
-double compute_errorR(u_R, v_R)
-{
-  e_nowR = u_R - v_R; 
-}
+
 //Compute error integrals
 double lefterror_integral()
 {
-
+  double e_intL = 
 }
 double righterror_integral()
 {
@@ -237,11 +229,13 @@ void loop() {
 compute_vehicle_speed(v_L, v_R);
 compute_vehicle_rate(v_L, v_R);
 
-//calculate speed error
-compute_errorLeft(u_L, v_L);
-compute_errorRight(u_R, v_R); 
+//Caclulate errors 
+double e_nowL = u_L - v_L; 
+double e_nowR = u_R - v_R; 
 
 //calculate error integral 
+double e_intL = 
+double e_intR = 
 
 //implement PI control  
 PI_controller_left(e_nowL, e_intL, k_P, k_L); 
