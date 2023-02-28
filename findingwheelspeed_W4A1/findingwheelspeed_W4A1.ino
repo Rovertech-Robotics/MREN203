@@ -39,6 +39,9 @@ const byte M4 = 2;
 // Motor PWM command variable [0-255]
 byte u_L = 0;
 byte u_R = 0;
+// Integral error
+double e_intL = 0;
+double e_intR = 0;
 // Encoder ticks per (motor) revolution (TPR)
 const int TPR = 3000;
 
@@ -59,6 +62,13 @@ const double ELL = 0.2775;
 //speed of the left and right wheels 
 double v_L = 0;
 double v_R =0; 
+//left and right desired speeds 
+double des_v_L; 
+double des_v_R; 
+//Overall desired vehicle speed 
+double V = 0.25; 
+// Desired vehicle turning rate
+double omega = 0; 
 //Set gains for the feedback controller, k_P, k_I
 const double k_P = 200; 
 const double k_I = 100; 
@@ -71,7 +81,34 @@ long t_last = 0;
 
 // Counter to keep track of encoder ticks [integer]
 // Counter to keep track of the last number of ticks [integer]
-long encoder_ticks_last = 0;
+long encoder_ticks_left = 0;
+long encode_ticks_right = 0; 
+
+// Compute vehicle speed [m/s]
+double compute_vehicle_speed(double v_L, double v_R) 
+{
+    double v; 
+    v = 0.5*(v_L+v_R);
+    return v;
+}
+// Compute vehicle turning rate [rad/s]
+double compute_vehicle_rate(double v_L, double v_R)
+{
+    double omega;
+    omega = 1.0 / ELL*(v_R-v_L); 
+    return omega;
+}
+//Find desired left wheel speed
+double leftwheel_speed(double omega, double V)
+{
+  des_v_L = V-omega*ELL/2; 
+  return des_v_L; 
+}
+double rightwheel_speed(double omegam, double B)
+{
+  des_v_R = omega*ELL/2+V; 
+  return des_v_R; 
+}
   
 // This function is called when SIGNAL_A goes HIGH
 void decodeEncoderTicks()
@@ -101,61 +138,21 @@ void decodeEncoderTicks2()
         encoder_ticks2++;
     }
 }
-// Compute vehicle speed [m/s]
-double compute_vehicle_speed(double v_L, double v_R) 
-{
-    double v; 
-    v = 0.5*(v_L+v_R);
-    return v;
-}
-// Compute vehicle turning rate [rad/s]
-double compute_vehicle_rate(double v_L, double v_R)
-{
-    double omega;
-    omega = 1.0 / ELL*(v_R-v_L); 
-    return omega;
-}
-
-//Compute error integrals
-double lefterror_integral()
-{
-  double e_intL = 
-}
-double righterror_integral()
-{
-
-}
 
 //Compute errors and ensure that the input, u, stays between 0-255
-short PI_controller_left(double e_nowL, double e_int, double k_P, double k_I)
+short PI_controller (double e_now, double k_p, double e_int, double k_i)
 {
-    short u_L; 
-    u_L = (short)(k_P*e_nowL+k_I*e_intL); 
-    if (u_L>255)
-    {
-      u_L = 255;
-    }
-    else if (u_L<-255)
-    {
-      u_L = -255;
-
-    }
-    return u_L; 
-}
-short PI_controller_right(double e_nowR, double e_int, double k_P, double k_I)
-{
-    short u_R; 
-    u_R = (short)(k_P*e_nowR+k_I*e_intR); 
-    if (u_R>255)
-    {
-      u_R = 255;
-    }
-    else if (u_R<-255)
-    {
-      u_R = -255;
-      
-    }
-    return u_R; 
+  short u;
+  u = short(k_p * e_now + k_i * e_int);
+  if (u > 255)
+  {
+    u = 255;
+  }
+  else if  (u < -255)
+  {
+    u = -255;
+  }
+  return u;
 }
 
 void setup()
@@ -185,7 +182,18 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(SIGNAL_A), decodeEncoderTicks, RISING);
     attachInterrupt(digitalPinToInterrupt(SIGNAL_C), decodeEncoderTicks2, RISING);
     
+// Get desired left and right wheel speeds
+des_v_L = leftwheel_speed(omega, V);
+des_v_R = rightwheel_speed(omega, V);
 
+Serial.print(des_v_L);
+Serial.print("\n");
+Serial.print(des_v_R);
+Serial.print("\n");
+
+// Print a message
+Serial.print("Program initialized.");
+Serial.print("\n");
 
 }
 
@@ -212,34 +220,46 @@ void loop() {
 
 
     // Set the wheel motor PWM command [0-255]
-    u_R = 200;
-    u_L = 200;
+    u_L = PI_controller (des_v_L - v_L, 100, e_intL, 50);
+    u_R = PI_controller (des_v_R - v_R, 100, e_intR, 50);
     //Safety delay
     delay(2000);
 
-    // Write to the output pins
-    digitalWrite(M1, LOW); // Drive forward (left wheels)
-    digitalWrite(M2, HIGH);
-    analogWrite(E1, u_L);    // Write left motors command
-    digitalWrite(M3, LOW); // Drive forward (right wheels)
-    digitalWrite(M4, HIGH);
-    analogWrite(E2, u_R);    // Write rightmotors command
+    if (abs(u_L) < 255){
+        e_intL += (des_v_L - v_L);
+      }
+      if (abs(u_R) < 255){
+        e_intR += (des_v_R - v_R);
+      }
+// Select a direction
+    if (u_L > 0)
+    {
+      digitalWrite(I3, HIGH);
+      digitalWrite(I4, LOW);
+    }
+    else
+    {
+      digitalWrite(I3, LOW);
+      digitalWrite(I4, HIGH);
+    }
 
-//calculate speed and turn rate
-compute_vehicle_speed(v_L, v_R);
-compute_vehicle_rate(v_L, v_R);
+    if (u_R < 0)
+    {
+      digitalWrite(I1, HIGH);
+      digitalWrite(I2, LOW);
+    }
+    else
+    {
+      digitalWrite(I1, LOW);
+    digitalWrite(I2, HIGH);
+    }
+    
+    
 
-//Caclulate errors 
-double e_nowL = u_L - v_L; 
-double e_nowR = u_R - v_R; 
+    // PWM command to the motor driver
+    analogWrite(EA, abs(u_R));
+    analogWrite(EB, abs(u_L));
 
-//calculate error integral 
-double e_intL = 
-double e_intR = 
-
-//implement PI control  
-PI_controller_left(e_nowL, e_intL, k_P, k_L); 
-PI_controller_right(e_nowR, e_intR, k_P,k_L); 
 }
 
 
